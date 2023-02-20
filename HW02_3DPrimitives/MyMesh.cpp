@@ -60,9 +60,21 @@ void MyMesh::GenerateCone(float a_fRadius, float a_fHeight, int a_nSubdivisions,
 	Release();
 	Init();
 
-	// Replace this with your code
-	GenerateCube(a_fRadius * 2.0f, a_v3Color);
-	// -------------------------------
+	float fHeight = a_fHeight / 2;
+	vector3 point = vector3(0.0f, fHeight, 0.0f);	//point at the very tip of the triangle
+	vector3 baseCenter = vector3(0.0f, -fHeight, 0.0f);		//point at the center of the triangles base
+	float radCurr = 0.0f;		
+	float radScale = 2.0f / a_nSubdivisions;	
+	for (int i = 0; i < a_nSubdivisions; i++) {
+		//get left and right vertices for the base of the triangle
+		vector3 baseLeft = vector3(cos(radCurr * PI) * a_fRadius, -fHeight,sin(radCurr * PI) * a_fRadius);
+		radCurr += radScale;
+		vector3 baseRight = vector3(cos(radCurr * PI) * a_fRadius, -fHeight, sin(radCurr * PI) * a_fRadius);
+		AddTri(baseLeft, baseRight, baseCenter);
+		AddTri(baseRight, baseLeft, point);
+
+	}
+	
 
 	// Adding information about color
 	CompleteMesh(a_v3Color);
@@ -84,9 +96,25 @@ void MyMesh::GenerateCylinder(float a_fRadius, float a_fHeight, int a_nSubdivisi
 	Release();
 	Init();
 
-	// Replace this with your code
-	GenerateCube(a_fRadius * 2.0f, a_v3Color);
-	// -------------------------------
+	float fHeight = a_fHeight / 2;
+	vector3 topCenter = vector3(0.0f, fHeight, 0.0f);	//point at the very top of the cylinder
+	vector3 baseCenter = vector3(0.0f, -fHeight, 0.0f);		//point at the center of the cylinders base
+	float radCurr = 0.0f;	//current radians
+	float radScale = 2.0f / a_nSubdivisions;	//radian increment
+	for (int i = 0; i < a_nSubdivisions; i++) {
+		//get left and right vertices for the base and top of the cylinder
+		vector3 baseLeft = vector3(cos(radCurr * PI) * a_fRadius, -fHeight, sin(radCurr * PI) * a_fRadius);
+		vector3 topLeft = vector3(cos(radCurr * PI) * a_fRadius, fHeight, sin(radCurr * PI) * a_fRadius);
+		radCurr += radScale;
+		vector3 baseRight = vector3(cos(radCurr * PI) * a_fRadius, -fHeight, sin(radCurr * PI) * a_fRadius);
+		vector3 topRight = vector3(cos(radCurr * PI) * a_fRadius, fHeight, sin(radCurr * PI) * a_fRadius);
+		
+		//adding two triangles for top and bottom
+		AddTri(baseLeft, baseRight, baseCenter);
+		AddTri(topRight, topLeft, topCenter);
+		//adding rectangle for middle
+		AddQuad(baseRight, baseLeft, topRight, topLeft);
+	}
 
 	// Adding information about color
 	CompleteMesh(a_v3Color);
@@ -114,15 +142,34 @@ void MyMesh::GenerateTube(float a_fOuterRadius, float a_fInnerRadius, float a_fH
 	Release();
 	Init();
 
-	// Replace this with your code
-	GenerateCube(a_fOuterRadius * 2.0f, a_v3Color);
-	// -------------------------------
+	float fHeight = a_fHeight / 2;
+	float radCurr = 0.0f;	//current radians
+	float radScale = 2.0f / a_nSubdivisions;	//radian increment
+	for (int i = 0; i < a_nSubdivisions; i++) {
+		//get left and right vertices for the base and top of the cylinder
+		vector3 baseLeftOut = vector3(cos(radCurr * PI) * a_fOuterRadius, -fHeight, sin(radCurr * PI) * a_fOuterRadius);
+		vector3 topLeftOut = vector3(cos(radCurr * PI) * a_fOuterRadius, fHeight, sin(radCurr * PI) * a_fOuterRadius);
+		vector3 baseLeftIn = vector3(cos(radCurr * PI) * a_fInnerRadius, -fHeight, sin(radCurr * PI) * a_fInnerRadius);
+		vector3 topLeftIn = vector3(cos(radCurr * PI) * a_fInnerRadius, fHeight, sin(radCurr * PI) * a_fInnerRadius);
+		radCurr += radScale;
+		vector3 baseRightOut = vector3(cos(radCurr * PI) * a_fOuterRadius, -fHeight, sin(radCurr * PI) * a_fOuterRadius);
+		vector3 topRightOut = vector3(cos(radCurr * PI) * a_fOuterRadius, fHeight, sin(radCurr * PI) * a_fOuterRadius);
+		vector3 baseRightIn = vector3(cos(radCurr * PI) * a_fInnerRadius, -fHeight, sin(radCurr * PI) * a_fInnerRadius);
+		vector3 topRightIn = vector3(cos(radCurr * PI) * a_fInnerRadius, fHeight, sin(radCurr * PI) * a_fInnerRadius);
 
+		//adding two quads for top and bottom
+		AddQuad(baseLeftOut, baseRightOut, baseLeftIn, baseRightIn);
+		AddQuad(topRightOut, topLeftOut, topRightIn, topLeftIn);
+		//adding two rectangles for outside and middle
+		AddQuad(baseRightOut, baseLeftOut, topRightOut, topLeftOut);
+		AddQuad(baseLeftIn, baseRightIn, topLeftIn, topRightIn);
+	}
 	// Adding information about color
 	CompleteMesh(a_v3Color);
 	CompileOpenGL3X();
+
 }
-void MyMesh::GenerateTorus(float a_fOuterRadius, float a_fInnerRadius, int a_nSubdivisionsA, int a_nSubdivisionsB, vector3 a_v3Color)
+void MyMesh::GenerateTorus(float a_fOuterRadius, float a_fInnerRadius, int a_nSubdivisionsA, int a_nSubdivisionsB, vector3 a_v3Color)	//in the end couldn't fully figure out. possibly having trouble with changing the y value within the second if func
 {
 	if (a_fOuterRadius < 0.01f)
 		a_fOuterRadius = 0.01f;
@@ -146,16 +193,45 @@ void MyMesh::GenerateTorus(float a_fOuterRadius, float a_fInnerRadius, int a_nSu
 	Release();
 	Init();
 
-	// Replace this with your code
-	GenerateCube(a_fOuterRadius * 2.0f, a_v3Color);
-	// -------------------------------
+	float radCurrA = 0.0f;	//current radians A
+	float radScaleA = 2.0f / a_nSubdivisionsA;	//radian increment A
+	float radCurrB = 0.0f;	//current radians B
+	float radScaleB = 2.0f / a_nSubdivisionsB;	//radian increment B
+	for (int i = 0; i < a_nSubdivisionsA-1; i++) {
+		vector3 ringCenter = vector3(cos(radCurrA * PI) * (a_fOuterRadius - (a_fOuterRadius - a_fInnerRadius) / 2), 0.0f, sin(radCurrA * PI) * (a_fOuterRadius - (a_fOuterRadius - a_fInnerRadius) / 2));
+		for (int i = 0; i < a_nSubdivisionsB; i++) {
+			//get first two points
+			vector3 firstL = vector3(cos(radCurrB * PI) * (a_fOuterRadius - a_fInnerRadius) / 2, a_fOuterRadius - a_fInnerRadius/2, sin(radCurrB * PI) * (a_fOuterRadius - a_fInnerRadius) / 2);
+			radCurrB += radScaleB;
+			vector3 firstR = vector3(cos(radCurrB * PI) * (a_fOuterRadius - a_fInnerRadius) / 2, a_fOuterRadius - a_fInnerRadius / 2, sin(radCurrB * PI) * (a_fOuterRadius - a_fInnerRadius) / 2);
+			vector3 bottomL = ringCenter + firstL;
+			vector3 bottomR = ringCenter + firstR;
+			radCurrA += radScaleA;
+			ringCenter = vector3(cos(radCurrA * PI) * (a_fOuterRadius - (a_fOuterRadius - a_fInnerRadius) / 2), 0.0f, sin(radCurrA * PI) * (a_fOuterRadius - (a_fOuterRadius - a_fInnerRadius) / 2));
+			vector3 topL = ringCenter + firstL;
+			vector3 topR = ringCenter + firstR;
+			AddQuad(bottomL, bottomR, topL, topR);
+		}
+		//get left and right vertices for the base and top of the cylinder
+		//vector3 baseLeft = vector3(cos(radCurr * PI) * a_fRadius, -fHeight, sin(radCurr * PI) * a_fRadius);
+		//vector3 topLeft = vector3(cos(radCurr * PI) * a_fRadius, fHeight, sin(radCurr * PI) * a_fRadius);
+		//radCurr += radScale;
+		//vector3 baseRight = vector3(cos(radCurr * PI) * a_fRadius, -fHeight, sin(radCurr * PI) * a_fRadius);
+		//vector3 topRight = vector3(cos(radCurr * PI) * a_fRadius, fHeight, sin(radCurr * PI) * a_fRadius);
+
+		//adding two triangles for top and bottom
+		//AddTri(baseLeft, baseRight, baseCenter);
+		//AddTri(topRight, topLeft, topCenter);
+		//adding rectangle for middle
+		//AddQuad(baseRight, baseLeft, topRight, topLeft);
+	}
 
 	// Adding information about color
 	CompleteMesh(a_v3Color);
 	CompileOpenGL3X();
 }
-void MyMesh::GenerateSphere(float a_fRadius, int a_nSubdivisions, vector3 a_v3Color)
-{
+void MyMesh::GenerateSphere(float a_fRadius, int a_nSubdivisions, vector3 a_v3Color)	//not sure if this is acceptable but it was the best I could come up with, it generates a shape,
+{																						//however instrctions on what exactly counts as a sphere was vague
 	if (a_fRadius < 0.01f)
 		a_fRadius = 0.01f;
 
@@ -171,9 +247,24 @@ void MyMesh::GenerateSphere(float a_fRadius, int a_nSubdivisions, vector3 a_v3Co
 	Release();
 	Init();
 
-	// Replace this with your code
-	GenerateCube(a_fRadius * 2.0f, a_v3Color);
-	// -------------------------------
+	vector3 topCenter = vector3(0.0f, a_fRadius, 0.0f);	//point at the very top of the cylinder
+	vector3 baseCenter = vector3(0.0f, -a_fRadius, 0.0f);		//point at the center of the cylinders base
+	float radCurr = 0.0f;	//current radians
+	float radScale = 2.0f / a_nSubdivisions;	//radian increment
+	for (int i = 0; i < a_nSubdivisions; i++) {
+		//get left and right vertices for the base and top of the cylinder
+		vector3 baseLeft = vector3(cos(radCurr * PI) * a_fRadius, -a_fRadius/2, sin(radCurr * PI) * a_fRadius);
+		vector3 topLeft = vector3(cos(radCurr * PI) * a_fRadius, a_fRadius/2, sin(radCurr * PI) * a_fRadius);
+		radCurr += radScale;
+		vector3 baseRight = vector3(cos(radCurr * PI) * a_fRadius, -a_fRadius/2, sin(radCurr * PI) * a_fRadius);
+		vector3 topRight = vector3(cos(radCurr * PI) * a_fRadius, a_fRadius/2, sin(radCurr * PI) * a_fRadius);
+
+		//adding two triangles for top and bottom
+		AddTri(baseLeft, baseRight, baseCenter);
+		AddTri(topRight, topLeft, topCenter);
+		//adding rectangle for middle
+		AddQuad(baseRight, baseLeft, topRight, topLeft);
+	}
 
 	// Adding information about color
 	CompleteMesh(a_v3Color);
