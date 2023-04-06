@@ -169,7 +169,11 @@ void MyMesh::GenerateTube(float a_fOuterRadius, float a_fInnerRadius, float a_fH
 	CompileOpenGL3X();
 
 }
-void MyMesh::GenerateTorus(float a_fOuterRadius, float a_fInnerRadius, int a_nSubdivisionsA, int a_nSubdivisionsB, vector3 a_v3Color)	//in the end couldn't fully figure out. possibly having trouble with changing the y value within the second if func
+
+//in the end I wasn't able to figure out how to properly display the torus. I was trying to essentially get vectors for two points on the torus where the 
+//subdivisionsA would be, then find two points for circles for each of those. connect+ display them, then iterate through until that
+//section is done, however I think something is wrong with my left vs right points as half of the quads seem to display correctly, while the other half doesnt.
+void MyMesh::GenerateTorus(float a_fOuterRadius, float a_fInnerRadius, int a_nSubdivisionsA, int a_nSubdivisionsB, vector3 a_v3Color)
 {
 	if (a_fOuterRadius < 0.01f)
 		a_fOuterRadius = 0.01f;
@@ -197,33 +201,21 @@ void MyMesh::GenerateTorus(float a_fOuterRadius, float a_fInnerRadius, int a_nSu
 	float radScaleA = 2.0f / a_nSubdivisionsA;	//radian increment A
 	float radCurrB = 0.0f;	//current radians B
 	float radScaleB = 2.0f / a_nSubdivisionsB;	//radian increment B
-	for (int i = 0; i < a_nSubdivisionsA-1; i++) {
-		vector3 ringCenter = vector3(cos(radCurrA * PI) * (a_fOuterRadius - (a_fOuterRadius - a_fInnerRadius) / 2), 0.0f, sin(radCurrA * PI) * (a_fOuterRadius - (a_fOuterRadius - a_fInnerRadius) / 2));
+	for (int i = 0; i < a_nSubdivisionsA; i++) {
+		vector3 ringCenter = vector3(cos(radCurrA * PI) * (a_fOuterRadius - ((a_fOuterRadius - a_fInnerRadius) / 2)), 0.0f, sin(radCurrA * PI) * (a_fOuterRadius - ((a_fOuterRadius - a_fInnerRadius) / 2)));
+		vector3 ringFuture = vector3(cos((radCurrA+radScaleA) * PI) * (a_fOuterRadius - ((a_fOuterRadius - a_fInnerRadius) / 2)), 0.0f, sin((radCurrA + radScaleA) * PI) * (a_fOuterRadius - ((a_fOuterRadius - a_fInnerRadius) / 2)));
 		for (int i = 0; i < a_nSubdivisionsB; i++) {
 			//get first two points
-			vector3 firstL = vector3(cos(radCurrB * PI) * (a_fOuterRadius - a_fInnerRadius) / 2, a_fOuterRadius - a_fInnerRadius/2, sin(radCurrB * PI) * (a_fOuterRadius - a_fInnerRadius) / 2);
+			vector3 firstL = vector3(cos(radCurrB * PI) * (a_fOuterRadius - a_fInnerRadius)/2, tan(radCurrB * PI) * (cos(radCurrB * PI) * (a_fOuterRadius - a_fInnerRadius)/2), sin(radCurrB * PI) * (a_fOuterRadius - a_fInnerRadius)/2);
 			radCurrB += radScaleB;
-			vector3 firstR = vector3(cos(radCurrB * PI) * (a_fOuterRadius - a_fInnerRadius) / 2, a_fOuterRadius - a_fInnerRadius / 2, sin(radCurrB * PI) * (a_fOuterRadius - a_fInnerRadius) / 2);
+			vector3 firstR = vector3(cos(radCurrB * PI) * (a_fOuterRadius - a_fInnerRadius)/2, tan(radCurrB * PI)* (cos(radCurrB * PI) * (a_fOuterRadius - a_fInnerRadius)/2), sin(radCurrB * PI) * (a_fOuterRadius - a_fInnerRadius)/2);
 			vector3 bottomL = ringCenter + firstL;
 			vector3 bottomR = ringCenter + firstR;
-			radCurrA += radScaleA;
-			ringCenter = vector3(cos(radCurrA * PI) * (a_fOuterRadius - (a_fOuterRadius - a_fInnerRadius) / 2), 0.0f, sin(radCurrA * PI) * (a_fOuterRadius - (a_fOuterRadius - a_fInnerRadius) / 2));
-			vector3 topL = ringCenter + firstL;
-			vector3 topR = ringCenter + firstR;
+			vector3 topL = ringFuture + firstL;
+			vector3 topR = ringFuture + firstR;
 			AddQuad(bottomL, bottomR, topL, topR);
 		}
-		//get left and right vertices for the base and top of the cylinder
-		//vector3 baseLeft = vector3(cos(radCurr * PI) * a_fRadius, -fHeight, sin(radCurr * PI) * a_fRadius);
-		//vector3 topLeft = vector3(cos(radCurr * PI) * a_fRadius, fHeight, sin(radCurr * PI) * a_fRadius);
-		//radCurr += radScale;
-		//vector3 baseRight = vector3(cos(radCurr * PI) * a_fRadius, -fHeight, sin(radCurr * PI) * a_fRadius);
-		//vector3 topRight = vector3(cos(radCurr * PI) * a_fRadius, fHeight, sin(radCurr * PI) * a_fRadius);
-
-		//adding two triangles for top and bottom
-		//AddTri(baseLeft, baseRight, baseCenter);
-		//AddTri(topRight, topLeft, topCenter);
-		//adding rectangle for middle
-		//AddQuad(baseRight, baseLeft, topRight, topLeft);
+		radCurrA += radScaleA;
 	}
 
 	// Adding information about color

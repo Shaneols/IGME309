@@ -22,6 +22,9 @@ class Application
 {
 	uint m_uMeshCount = 10;
 	MyMesh* m_pMesh;
+	std::vector<MyMesh*> m_pMeshList;
+	float fOffset = 0.0;
+	bool moveLeft = true;
 private:
 	String m_sProgrammer = "Alberto Bobadilla - labigm@rit.edu";
 	static ImGuiObject gui; //GUI object

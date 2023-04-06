@@ -34,14 +34,22 @@ void Application::Display(void)
 	matrix4 m4View = m_pCameraMngr->GetViewMatrix();
 	matrix4 m4Projection = m_pCameraMngr->GetProjectionMatrix();
 
-	m_m4Model = glm::rotate(IDENTITY_M4, glm::radians(m_v3Rotation.x), vector3(1.0f, 0.0f, 0.0f));
-	m_m4Model = glm::rotate(m_m4Model, glm::radians(m_v3Rotation.y), vector3(0.0f, 1.0f, 0.0f));
-	m_m4Model = glm::rotate(m_m4Model, glm::radians(m_v3Rotation.z), vector3(0.0f, 0.0f, 1.0f));
+	//m_m4Model = glm::rotate(IDENTITY_M4, glm::radians(m_v3Rotation.x), vector3(1.0f, 0.0f, 0.0f));
+	//m_m4Model = glm::rotate(m_m4Model, glm::radians(m_v3Rotation.y), vector3(0.0f, 1.0f, 0.0f));
+	//m_m4Model = glm::rotate(m_m4Model, glm::radians(m_v3Rotation.z), vector3(0.0f, 0.0f, 1.0f));
+	
+	quaternion q1 = glm::angleAxis(q5.x, vector3(1.0f, 0.0f, 0.0f));
+	quaternion q2 = glm::angleAxis(q5.y, vector3(0.0f, 1.0f, 0.0f));
+	quaternion q3 = glm::angleAxis(q5.z, vector3(0.0f, 0.0f, 1.0f));
+	quaternion q4 = q1 * q2;
+	q4 = glm::cross(q4, q3);
+
+	matrix4 rotMatrix = ToMatrix4(q4);
 	/*
 	* The following line was replaced by the model manager so we can see a model instead of a cone
 	*/
 	//m_pMesh->Render(m4Projection, m4View, ToMatrix4(m_m4Model));
-	m_pModelMngr->AddModelToRenderList(m_sSteve, m_m4Model);
+	m_pModelMngr->AddModelToRenderList(m_sSteve, ToMatrix4(q4));
 
 
 	// draw a skybox

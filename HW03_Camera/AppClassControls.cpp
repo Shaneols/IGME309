@@ -81,10 +81,10 @@ void Application::ProcessKeyboard(void)
 		fSpeed *= 5.0f;
 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
-		m_pCamera->MoveForward(fSpeed);
+		m_pCamera->MoveForward(-fSpeed);
 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
-		m_pCamera->MoveForward(-fSpeed);
+		m_pCamera->MoveForward(fSpeed);
 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
 		m_pCamera->MoveSideways(-fSpeed);

@@ -107,27 +107,27 @@ void Application::ProcessKeyboard(void)
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::X))
 	{
 		if (fMultiplier)
-			m_v3Rotation.x -= 1.0f;
+			q5.x -= glm::radians(1.0f);
 		else
-			m_v3Rotation.x += 1.0f;
+			q5.x += glm::radians(1.0f);
 	}
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Y))
 	{
 		if (fMultiplier)
-			m_v3Rotation.y -= 1.0f;
+			q5.y -= glm::radians(1.0f);
 		else
-			m_v3Rotation.y += 1.0f;
+			q5.y += glm::radians(1.0f);
 	}
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Z))
 	{
 		if (fMultiplier)
-			m_v3Rotation.z -= 1.0f;
+			q5.z -= glm::radians(1.0f);
 		else
-			m_v3Rotation.z += 1.0f;
+			q5.z += glm::radians(1.0f);
 	}
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::R))
 	{
-		m_v3Rotation = vector3(0.0f);
+		q5 = quaternion(vector3(0.0f));
 	}
 }
 //Mouse
